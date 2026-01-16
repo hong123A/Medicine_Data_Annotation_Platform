@@ -37,7 +37,7 @@ const DataEditing: React.FC = () => {
         </div>
       </div>
 
-      {/* 筛选区域 - 参照截图1 */}
+      {/* 筛选区域 */}
       <div className="bg-white p-6 shadow-sm flex flex-wrap gap-y-4 gap-x-8 border-b border-slate-100">
         <FilterInput label="任务名称" placeholder="请输入任务名称" />
         <FilterInput label="子任务名称" placeholder="请输入子任务名称" />
@@ -81,7 +81,7 @@ const DataEditing: React.FC = () => {
         </div>
       </div>
 
-      {/* 列表主体 - 参照截图1 */}
+      {/* 列表主体 */}
       <div className="flex-1 overflow-auto p-4 bg-slate-50/30">
         <div className="bg-white rounded border border-slate-200 shadow-sm overflow-hidden">
           <table className="w-full text-left text-[13px] whitespace-nowrap">
@@ -126,7 +126,7 @@ const DataEditing: React.FC = () => {
                       onClick={() => setEditingItem(item)}
                       className="text-cyan-600 hover:text-cyan-800 font-bold transition-colors"
                     >
-                      查看
+                      去标注
                     </button>
                   </td>
                 </tr>
@@ -163,8 +163,11 @@ const FilterInput = ({ label, placeholder }: any) => (
   </div>
 );
 
-// 模拟编辑界面
+// 标注详情界面
 const AnnotationInterface = ({ item, onBack }: { item: AnnotationTask, onBack: () => void }) => {
+  // 判断是中医还是西医任务
+  const isWM = item.title.includes('西医') || item.title.includes('ICD') || item.title.includes('EHR') || item.title.includes('临床指南(WM)');
+
   return (
     <div className="h-full flex flex-col bg-slate-50">
       <div className="bg-white h-12 border-b border-slate-200 px-6 flex items-center justify-between shadow-sm">
@@ -173,10 +176,11 @@ const AnnotationInterface = ({ item, onBack }: { item: AnnotationTask, onBack: (
             <ArrowLeft size={18} />
           </button>
           <h3 className="font-bold text-slate-800">正在标注：{item.title}</h3>
+          <span className="px-2 py-0.5 bg-slate-100 text-slate-500 text-[10px] font-bold rounded">ID: {item.id}</span>
         </div>
         <div className="flex gap-2">
           <button className="px-4 py-1.5 bg-slate-100 text-slate-600 rounded text-sm font-bold">暂存</button>
-          <button className="px-4 py-1.5 bg-blue-600 text-white rounded text-sm font-bold flex items-center gap-1.5">
+          <button className="px-4 py-1.5 bg-blue-600 text-white rounded text-sm font-bold flex items-center gap-1.5 shadow-lg shadow-blue-100">
             <Save size={16} /> 提交标注
           </button>
         </div>
@@ -185,39 +189,68 @@ const AnnotationInterface = ({ item, onBack }: { item: AnnotationTask, onBack: (
         {/* 左侧标注内容 */}
         <div className="flex-1 overflow-auto p-6 flex flex-col items-center justify-center">
           {item.type === 'image' ? (
-            <div className="bg-white p-4 rounded-xl shadow-lg border border-slate-200 relative group">
-              <img src={item.imageUrl} alt="TCM clinical" className="max-w-full max-h-[70vh] rounded shadow-sm" />
-              <div className="absolute top-8 right-8 flex flex-col gap-2">
-                <button className="p-2 bg-white/80 backdrop-blur rounded shadow hover:bg-white"><ZoomIn size={20}/></button>
+            <div className="bg-white p-4 rounded-2xl shadow-xl border border-slate-200 relative group">
+              <img src={item.imageUrl} alt="Clinical Image" className="max-w-full max-h-[70vh] rounded shadow-sm" />
+              <div className="absolute top-8 right-8 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button className="p-2 bg-white/90 backdrop-blur rounded shadow-lg hover:bg-white text-slate-600"><ZoomIn size={20}/></button>
               </div>
             </div>
           ) : (
-            <div className="bg-white p-10 rounded-xl shadow-lg border border-slate-200 max-w-3xl w-full">
-              <h4 className="text-lg font-bold text-slate-900 mb-6 border-b pb-4">中医电子病历记录</h4>
-              <p className="text-slate-700 leading-relaxed text-lg mb-8">
-                患者主诉反复咳嗽咳痰2年，加重3天。现症见：咳嗽痰多，色白质稀，畏寒肢冷，神疲乏力。
-                舌质淡胖，苔白滑，脉细弱。初步诊断：肺胀（阳虚水泛证）。建议予以补肺纳气、利水消肿之法。
-              </p>
+            <div className="bg-white p-10 rounded-2xl shadow-xl border border-slate-200 max-w-4xl w-full">
+              <div className="flex justify-between items-center mb-6 border-b pb-4">
+                <h4 className="text-xl font-black text-slate-900 flex items-center gap-2">
+                  <FileText size={20} className="text-blue-600" />
+                  {isWM ? '西医临床电子病历 (EHR)' : '中医临床诊疗记录 (TCM)'}
+                </h4>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Medical Record No. 4992-02</span>
+              </div>
+              
+              <div className="text-slate-700 leading-relaxed text-lg mb-10 bg-slate-50/50 p-6 rounded-xl border border-slate-100 italic">
+                {isWM ? (
+                  <>
+                    <p className="mb-4">【现病史】患者，男，65岁。主诉反复胸痛1周。心电图提示：V1-V4导联ST段压低0.1-0.2mV。心脏超声示：左室射血分数（LVEF）52%。</p>
+                    <p>【实验室检查】肌钙蛋白I（cTnI）0.12 ng/ml（参考值 &lt; 0.04）。BNP 250 pg/ml。低密度脂蛋白（LDL-C）3.4 mmol/L。</p>
+                  </>
+                ) : (
+                  <>
+                    <p className="mb-4">【临床特征】患者反复咳嗽咳痰2年，加重3天。现症见：咳嗽痰多，色白质稀，畏寒肢冷，神疲乏力，气短懒言。</p>
+                    <p>【舌脉分析】舌质淡胖，边有齿痕，苔白滑。脉细弱无力。初步辨证考虑为肺胀（阳虚水泛证）。</p>
+                  </>
+                )}
+              </div>
+
               <div className="flex flex-wrap gap-3">
-                <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full border border-blue-100 text-xs font-bold">主诉识别</span>
-                <span className="px-3 py-1 bg-orange-50 text-orange-600 rounded-full border border-orange-100 text-xs font-bold">辨证标注</span>
+                <span className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full border border-blue-100 text-[10px] font-black uppercase tracking-wider">实体识别 (NER)</span>
+                <span className="px-3 py-1 bg-orange-50 text-orange-600 rounded-full border border-orange-100 text-[10px] font-black uppercase tracking-wider">语义关联 (REL)</span>
+                {isWM && <span className="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100 text-[10px] font-black uppercase tracking-wider">ICD编码对齐</span>}
               </div>
             </div>
           )}
         </div>
+        
         {/* 右侧标注工具栏 */}
-        <div className="w-80 bg-white border-l border-slate-200 p-6 shadow-[-4px_0_12px_rgba(0,0,0,0.02)] overflow-auto">
-          <h4 className="font-bold text-slate-800 mb-6 flex items-center gap-2 border-b pb-4">
-            <Tags size={18} className="text-blue-600" />
+        <div className="w-80 bg-white border-l border-slate-200 p-8 shadow-[-10px_0_30px_rgba(0,0,0,0.03)] overflow-auto">
+          <h4 className="font-black text-slate-800 mb-8 flex items-center gap-3 border-b border-slate-100 pb-5 uppercase tracking-tighter">
+            <Tags size={20} className="text-blue-600" />
             标注属性集
           </h4>
-          <div className="space-y-6">
-            <AnnotationField label="证候类型" options={['气虚证', '血瘀证', '阴虚火旺', '阳虚水泛', '痰热蕴肺']} />
-            <AnnotationField label="主要症状" options={['咳嗽', '咳痰', '胸闷', '心悸', '水肿']} />
-            <AnnotationField label="涉及经脉" options={['肺经', '脾经', '肾经', '心经']} />
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-500">备注说明</label>
-              <textarea placeholder="输入标注备注..." className="w-full h-24 border border-slate-200 rounded p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none" />
+          <div className="space-y-8">
+            {isWM ? (
+              <>
+                <AnnotationField label="诊断分类 (ICD-10)" options={['I20 冠心病', 'I50 心力衰竭', 'I10 高血压', 'E11 2型糖尿病', 'J44 COPD']} />
+                <AnnotationField label="临床指标标注" options={['肌钙蛋白', 'LVEF值', 'BNP', 'ST段压低', 'LDL-C']} />
+                <AnnotationField label="严重程度分级" options={['轻度', '中度', '重度', '危重']} />
+              </>
+            ) : (
+              <>
+                <AnnotationField label="证候类型 (TCM)" options={['气虚证', '血瘀证', '阴虚火旺', '阳虚水泛', '痰热蕴肺']} />
+                <AnnotationField label="主要症状提取" options={['咳嗽', '咳痰', '胸闷', '心悸', '水肿']} />
+                <AnnotationField label="涉及脏腑/经脉" options={['肺经', '脾经', '肾经', '心经', '肝经']} />
+              </>
+            )}
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">备注说明</label>
+              <textarea placeholder="输入标注备注或异常说明..." className="w-full h-32 border border-slate-200 rounded-xl p-4 text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none resize-none transition-all shadow-inner" />
             </div>
           </div>
         </div>
@@ -227,11 +260,11 @@ const AnnotationInterface = ({ item, onBack }: { item: AnnotationTask, onBack: (
 };
 
 const AnnotationField = ({ label, options }: any) => (
-  <div className="space-y-2">
-    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">{label}</label>
+  <div className="space-y-3">
+    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">{label}</label>
     <div className="flex flex-wrap gap-2">
       {options.map((opt: string) => (
-        <button key={opt} className="px-2.5 py-1 bg-slate-50 text-slate-600 border border-slate-200 rounded text-xs hover:border-blue-400 hover:text-blue-600 transition-all">
+        <button key={opt} className="px-3 py-1.5 bg-slate-50 text-slate-600 border border-slate-200 rounded-lg text-xs font-bold hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all shadow-sm">
           {opt}
         </button>
       ))}

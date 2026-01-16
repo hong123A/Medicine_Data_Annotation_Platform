@@ -39,34 +39,52 @@ export const generateMockTerms = (count: number, prefix: string = "中医"): Ter
 export const generateMockTasks = (count: number): AnnotationTask[] => {
   const statuses: ('加工中' | '待审核' | '已退回' | '已通过')[] = ['加工中', '待审核', '已退回', '已通过'];
   const names = ['王佳丽', '万虹', '李明', '张华', '赵晓东', '孙利'];
-  const titles = [
+  
+  const textTitles = [
     '《中医临床诊疗规范》文本抽取', 
-    '中医舌象特征点标注任务', 
-    '脉图波形自动识别标注', 
     '中西医对齐映射核对', 
     '经典医案结构化标注',
-    '糖尿病足创面愈合图像分类'
+    '西医出院小结核心实体识别',
+    '临床指南(WM)知识三元组提取',
+    'ICD-10 疾病编码自动分类',
+    '电子病历(EHR)实验室指标提取',
+    '中药处方自动识别标注任务',
+    '西医诊断逻辑链条标注',
+    'ICD-11 临床术语对齐校验',
+    '手术记录关键事件识别'
   ];
-  
-  const tcmImageSeeds = ['tongue', 'pulse', 'herb', 'acupoint', 'treatment', 'moxibustion'];
 
-  return Array.from({ length: count }, (_, i) => ({
-    id: `66${Math.random().toString(16).slice(2, 10)}${Math.random().toString(16).slice(2, 10)}`,
-    title: titles[i % titles.length] + (i >= titles.length ? `-${Math.floor(i / titles.length)}` : ""),
-    subTaskName: `66${Math.random().toString(16).slice(2, 22)}`,
-    status: statuses[i % 4],
-    returnCount: Math.floor(Math.random() * 3),
-    assignee: names[i % names.length],
-    assignTime: `2026-01-14 15:58:${(i % 60).toString().padStart(2, '0')}`,
-    editor: i % 2 === 0 ? '万虹' : '李明',
-    submitTime: i % 4 === 0 ? '——' : `2026-02-10 10:20:00`,
-    reviewer: '万虹',
-    reviewTime: i % 4 === 0 ? '——' : `2026-02-12 14:30:00`,
-    progress: Math.floor(Math.random() * 100),
-    priority: i % 3 === 0 ? '高' : '中',
-    type: i % 2 === 0 ? 'text' : 'image',
-    imageUrl: i % 2 === 0 ? undefined : `https://picsum.photos/seed/med-${i}/800/600`
-  }));
+  const imageTitles = [
+    '中医舌象特征点标注任务', 
+    '脉图波形自动识别标注', 
+    '糖尿病足创面愈合图像分类',
+    '甲状腺结节超声影像分类',
+    '中医面部望诊特征标注',
+    '放射科胸片(CXR)病灶勾画'
+  ];
+
+  return Array.from({ length: count }, (_, i) => {
+    const type: 'text' | 'image' = i % 2 === 0 ? 'text' : 'image';
+    const titles = type === 'text' ? textTitles : imageTitles;
+    
+    return {
+      id: `66${Math.random().toString(16).slice(2, 10)}${Math.random().toString(16).slice(2, 10)}`,
+      title: titles[i % titles.length] + (i >= titles.length ? `-${Math.floor(i / titles.length)}` : ""),
+      subTaskName: `66${Math.random().toString(16).slice(2, 22)}`,
+      status: statuses[i % 4],
+      returnCount: Math.floor(Math.random() * 3),
+      assignee: names[i % names.length],
+      assignTime: `2026-01-14 15:58:${(i % 60).toString().padStart(2, '0')}`,
+      editor: i % 2 === 0 ? '万虹' : '李明',
+      submitTime: i % 4 === 0 ? '——' : `2026-02-10 10:20:00`,
+      reviewer: '万虹',
+      reviewTime: i % 4 === 0 ? '——' : `2026-02-12 14:30:00`,
+      progress: Math.floor(Math.random() * 100),
+      priority: i % 3 === 0 ? '高' : '中',
+      type: type,
+      imageUrl: type === 'image' ? `https://picsum.photos/seed/med-${i}/800/600` : undefined
+    };
+  });
 };
 
 export const generateMockDBConnections = (count: number): DBConnection[] => {
