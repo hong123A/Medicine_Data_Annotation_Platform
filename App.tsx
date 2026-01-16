@@ -10,13 +10,13 @@ import {
   Cog,
   User
 } from 'lucide-react';
-import DataEditing from './components/DataEditing';
-import DataReview from './components/DataReview';
-import TaskManagement from './components/TaskManagement';
-import DataTableSection from './components/DataTableSection';
-import KnowledgeGraphView from './components/KnowledgeGraphView';
-import ConfigCenter from './components/ConfigCenter';
-import { ModuleType } from './types';
+import DataEditing from './components/DataEditing.tsx';
+import DataReview from './components/DataReview.tsx';
+import TaskManagement from './components/TaskManagement.tsx';
+import DataTableSection from './components/DataTableSection.tsx';
+import KnowledgeGraphView from './components/KnowledgeGraphView.tsx';
+import ConfigCenter from './components/ConfigCenter.tsx';
+import { ModuleType } from './types.ts';
 
 const App: React.FC = () => {
   const [activeModule, setActiveModule] = useState<ModuleType>(ModuleType.Editing);
@@ -35,7 +35,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
-      {/* 顶部导航栏 - 参考图2风格 */}
+      {/* 顶部导航栏 */}
       <header className="bg-[#1e3a8a] text-white px-6 h-16 flex items-center justify-between shadow-lg z-50">
         <div className="flex items-center space-x-12">
           <div className="flex items-center space-x-2">
